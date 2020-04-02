@@ -24,7 +24,7 @@ public class CreditMovementServiceTest {
   private final CreditMovementType creditMovementType1 = CreditMovementType.builder().name("PAGOS").build();
   private final CreditMovementType creditMovementType2 = CreditMovementType.builder().name("RETIRO DE EFECTIVO").build();
 
-  private final CreditMovement creditMovement1 = CreditMovement.builder().accountNumberOrigin("1231-1311-12334")
+  private final CreditMovement creditMovement1 = CreditMovement.builder().accountNumberOrigin("1231-1311-12222")
           .numDocOwner("75772936").amount(300.0).creditMovementType(creditMovementType1).build();
   private final CreditMovement creditMovement2 = CreditMovement.builder().accountNumberOrigin("1231-1311-11111")
           .numDocOwner("75772936").amount(200.0).creditMovementType(creditMovementType2).build();

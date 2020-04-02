@@ -108,6 +108,7 @@ public class CreditMovementServiceImpl implements CreditMovementService {
     return responseValidateCreditProduct.flatMap(resp -> {
 
       if (resp) {
+        creditMovement.setMovementDate(new Date());
         return this.updateAmountCreditProduct(creditMovement.getAccountNumberOrigin(), creditMovement.getAmount())
                 .then(repository.save(creditMovement));
       } else {

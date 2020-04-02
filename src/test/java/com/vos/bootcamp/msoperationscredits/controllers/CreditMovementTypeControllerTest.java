@@ -29,7 +29,7 @@ public class CreditMovementTypeControllerTest {
     client = WebTestClient
             .bindToController(new CreditMovementTypeController(creditMovementTypeService))
             .configureClient()
-            .baseUrl("/api/creditMovements_Types")
+            .baseUrl("/api/creditMovementsTypes")
             .build();
 
     expectedCreditMovementTypes = Arrays.asList(

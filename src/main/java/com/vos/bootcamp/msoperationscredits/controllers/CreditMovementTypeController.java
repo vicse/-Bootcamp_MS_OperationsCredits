@@ -4,17 +4,24 @@ import com.vos.bootcamp.msoperationscredits.models.CreditMovementType;
 import com.vos.bootcamp.msoperationscredits.services.CreditMovementTypeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import java.net.URI;
+import javax.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.validation.Valid;
-import java.net.URI;
 
 @RestController
-@RequestMapping("/api/creditMovements_Types")
+@RequestMapping("/api/creditMovementsTypes")
 @Api(value = "Bank Credits Movement Microservice")
 public class CreditMovementTypeController {
 
@@ -53,8 +60,8 @@ public class CreditMovementTypeController {
   @PostMapping
   @ApiOperation(value = "Create Credit Movement Type", notes = "Create CreditMovementType, check the model please")
   public Mono<ResponseEntity<CreditMovementType>> createCreditMovementType(
-          @Valid @RequestBody CreditMovementType CreditMovementType) {
-    return service.save(CreditMovementType)
+          @Valid @RequestBody CreditMovementType creditMovementType) {
+    return service.save(creditMovementType)
             .map(creditMovementTypeDB -> ResponseEntity
                     .created(URI.create("/api/creditMovements_Types/".concat(creditMovementTypeDB.getId())))
                     .contentType(MediaType.APPLICATION_JSON)
@@ -69,9 +76,9 @@ public class CreditMovementTypeController {
   @ApiOperation(value = "Update a CreditMovementType", notes = "Update a credit product Type by ID")
   public Mono<ResponseEntity<CreditMovementType>> updateCreditMovementType(
           @PathVariable String id,
-          @RequestBody CreditMovementType CreditMovementType) {
+          @RequestBody CreditMovementType creditMovementType) {
 
-    return service.update(id, CreditMovementType)
+    return service.update(id, creditMovementType)
             .map(creditMovementTypeDB -> ResponseEntity
                     .created(URI.create("/api/creditMovements_Types/".concat(creditMovementTypeDB.getId())))
                     .contentType(MediaType.APPLICATION_JSON)
