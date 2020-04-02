@@ -21,6 +21,8 @@ public interface CreditMovementService {
 
   public Mono<CreditProduct> updateAmountCreditProduct(String accountNumber, double amount);
 
-  public Mono<Boolean> validateCreditAccount(String accountNumber, String numDocOwner);
+  public Mono<Boolean> creditProductExits(String accountNumber);
+
+  public Mono<Boolean> validateCreditProduct(String accountNumber, String numDocOwner);
 
 }

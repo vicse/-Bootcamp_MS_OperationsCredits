@@ -20,13 +20,48 @@ public class CreditMovementServiceImpl implements CreditMovementService {
   }
 
   @Override
+  public Mono<Boolean> creditProductExits(String accountNumber) {
+    return WebClient
+            .create()
+            .get()
+            .uri("http://localhost:8003/api/creditProducts/" + accountNumber + "/exist")
+            .retrieve()
+            .bodyToMono(Boolean.class)
+            ;
+  }
+
+  @Override
   public Mono<CreditProduct> findCreditProductByAccountNumber(String accountNumber) {
     return WebClient
             .create()
             .get()
             .uri("http://localhost:8003/api/creditProducts/accountNumber/" + accountNumber)
             .retrieve()
-            .bodyToMono(CreditProduct.class);
+            .bodyToMono(CreditProduct.class)
+            ;
+
+  }
+
+  @Override
+  public Mono<Boolean> validateCreditProduct(String accountNumber, String numDocOwner) {
+
+    Mono<Boolean> respExistCreditProduct = creditProductExits(accountNumber);
+    Mono<CreditProduct> creditProductMono = findCreditProductByAccountNumber(accountNumber);
+
+    return respExistCreditProduct.flatMap( valueBoolean -> {
+
+      if (valueBoolean) {
+        return creditProductMono.flatMap(creditProduct -> {
+          if (creditProduct.getNumDocOwner().equals(numDocOwner)) {
+            return Mono.just(true);
+          } else {
+            return Mono.error(new Exception("This credit product does not belong to the client"));
+          }
+        });
+      } else {
+        return Mono.error(new Exception("This credit product not exist"));
+      }
+    });
 
   }
 
@@ -37,7 +72,7 @@ public class CreditMovementServiceImpl implements CreditMovementService {
       .flatMap(creditProduct -> {
 
         if (amount > creditProduct.getCreditAmountAvailable()) {
-          return Mono.error(new Exception("insufficient balance"));
+          return Mono.error(new Exception("Insufficient balance"));
         } else {
           creditProduct.setCreditAmountAvailable(creditProduct.getCreditAmountAvailable() - amount);
           creditProduct.setUpdatedAt(new Date());
@@ -54,26 +89,6 @@ public class CreditMovementServiceImpl implements CreditMovementService {
   }
 
   @Override
-  public Mono<Boolean> validateCreditAccount(String accountNumber, String numDocOwner) {
-
-    Mono<CreditProduct> creditProductMono = findCreditProductByAccountNumber(accountNumber);
-
-    return creditProductMono.flatMap(creditProduct -> {
-
-      if (creditProduct == null) {
-        return Mono.error(new Exception("This credit product not exist"));
-      } else {
-        if (creditProduct.getNumDocOwner().equals(numDocOwner)) {
-          return Mono.just(true);
-        } else {
-          return Mono.error(new Exception("This credit product does not belong to the client"));
-        }
-      }
-
-    });
-  }
-
-  @Override
   public Flux<CreditMovement> findAll() {
     return repository.findAll();
   }
@@ -86,7 +101,7 @@ public class CreditMovementServiceImpl implements CreditMovementService {
   @Override
   public Mono<CreditMovement> save(CreditMovement creditMovement) {
 
-    Mono<Boolean> responseValidateCreditProduct = validateCreditAccount(
+    Mono<Boolean> responseValidateCreditProduct = validateCreditProduct(
             creditMovement.getAccountNumberOrigin(),
             creditMovement.getNumDocOwner());
 
