@@ -3,6 +3,8 @@ package com.vos.bootcamp.msoperationscredits.services;
 import com.vos.bootcamp.msoperationscredits.models.CreditMovement;
 import com.vos.bootcamp.msoperationscredits.models.CreditProduct;
 import com.vos.bootcamp.msoperationscredits.repositories.CreditMovementRepository;
+import com.vos.bootcamp.msoperationscredits.repositories.CreditProductRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -15,31 +17,21 @@ public class CreditMovementServiceImpl implements CreditMovementService {
 
   private final CreditMovementRepository repository;
 
-  public CreditMovementServiceImpl(CreditMovementRepository repository) {
+  private final CreditProductRepository creditProductRepository;
+
+  public CreditMovementServiceImpl(CreditMovementRepository repository, CreditProductRepository creditProductRepository) {
     this.repository = repository;
+    this.creditProductRepository = creditProductRepository;
   }
 
   @Override
   public Mono<Boolean> creditProductExits(String accountNumber) {
-    return WebClient
-            .create()
-            .get()
-            .uri("http://localhost:8003/api/creditProducts/" + accountNumber + "/exist")
-            .retrieve()
-            .bodyToMono(Boolean.class)
-            ;
+    return creditProductRepository.creditProductExits(accountNumber);
   }
 
   @Override
   public Mono<CreditProduct> findCreditProductByAccountNumber(String accountNumber) {
-    return WebClient
-            .create()
-            .get()
-            .uri("http://localhost:8003/api/creditProducts/accountNumber/" + accountNumber)
-            .retrieve()
-            .bodyToMono(CreditProduct.class)
-            ;
-
+    return creditProductRepository.findCreditProductByAccountNumber(accountNumber);
   }
 
   @Override
@@ -76,13 +68,7 @@ public class CreditMovementServiceImpl implements CreditMovementService {
         } else {
           creditProduct.setCreditAmountAvailable(creditProduct.getCreditAmountAvailable() - amount);
           creditProduct.setUpdatedAt(new Date());
-          return WebClient
-                  .create()
-                  .put()
-                  .uri("http://localhost:8003/api/creditProducts/" + creditProduct.getId())
-                  .body(Mono.just(creditProduct), CreditProduct.class)
-                  .retrieve()
-                  .bodyToMono(CreditProduct.class);
+          return creditProductRepository.updateAmount(creditProduct);
         }
 
       });

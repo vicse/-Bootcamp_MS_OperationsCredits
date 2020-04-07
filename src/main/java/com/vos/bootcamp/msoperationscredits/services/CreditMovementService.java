@@ -2,20 +2,10 @@ package com.vos.bootcamp.msoperationscredits.services;
 
 import com.vos.bootcamp.msoperationscredits.models.CreditMovement;
 import com.vos.bootcamp.msoperationscredits.models.CreditProduct;
-import reactor.core.publisher.Flux;
+import com.vos.bootcamp.msoperationscredits.utils.ICrud;
 import reactor.core.publisher.Mono;
 
-public interface CreditMovementService {
-
-  public Flux<CreditMovement> findAll();
-
-  public Mono<CreditMovement> findById(String id);
-
-  public Mono<CreditMovement> save(CreditMovement creditMovement);
-
-  public Mono<CreditMovement> update(String id, CreditMovement creditMovement);
-
-  public Mono<CreditMovement> deleteById(String id);
+public interface CreditMovementService extends ICrud<CreditMovement> {
 
   public Mono<CreditProduct> findCreditProductByAccountNumber(String numAccount);
 
